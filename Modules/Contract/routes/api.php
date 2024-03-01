@@ -15,6 +15,14 @@ use Modules\Contract\App\Http\Controllers\UserController;
     | is assigned the "api" middleware group. Enjoy building your API!
     |
 */
+Route::prefix('/contract')->group(function () {
+    Route::controller(ContractController::class)->group(function () {
+        Route::get('/banback', 'banback');
+        Route::get('/pdf/{id}', 'pdf');
+
+    });
+});
+
 Route::middleware('auth:api')->group(function () {
     Route::prefix('/contract')->group(function () {
         Route::prefix('/category')->group(function () {
@@ -26,6 +34,9 @@ Route::middleware('auth:api')->group(function () {
         Route::controller(ContractController::class)->group(function () {
             Route::post('/create', 'create');
             Route::get('/details/{id}', 'details');
+            Route::post('/cr/{id}', 'cr');
+            Route::post('/payment/{id}', 'payment');
+
         });
 
 

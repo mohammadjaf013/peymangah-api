@@ -12,6 +12,7 @@ class ContractItemResource extends JsonResource
      */
     public function toArray($request): array
     {
+
         return [
             'id'=>$this->code,
             'title'=>$this->title,

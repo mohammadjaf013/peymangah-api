@@ -16,6 +16,10 @@ class ContractItemModel extends Model
         'sort_when_creating' => true,
     ];
 
+
+    protected $fillable=[
+        'content','sort_order','params','contract_id','contract_catitem_id'
+    ];
     public function buildSortQuery()
     {
         return static::query()->where('contract_catitem_id', $this->contract_catitem_id);

@@ -26,10 +26,16 @@ class ContractUserModel extends Model
     }
 
 
+    public function contract()
+    {
+        return $this->hasOne(ContractModel::class,"id","contract_id");
+    }
+
     protected $casts =[
         'photo'=>'encrypted',
         'birthday'=>'encrypted',
         'data'=>'encrypted:array',
+        'is_signed'=>'boolean',
     ];
 
 

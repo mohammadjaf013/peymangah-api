@@ -12,6 +12,14 @@ class UrlHelper
     {
         return 'http://localhost:3000/';
     }
+
+    public static function url($url=null){
+        if($url == null){
+            return 'http://localhost:3000/';
+        }
+        return 'http://localhost:3000/'.$url;
+    }
+
     public static function Make($url)
     {
         if (env("SECURE_URL", false)) {

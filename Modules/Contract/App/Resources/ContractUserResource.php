@@ -3,6 +3,7 @@
 namespace Modules\Contract\App\Resources;
 
 
+use App\Libs\Helper\UrlHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContractUserResource extends JsonResource
@@ -22,6 +23,9 @@ class ContractUserResource extends JsonResource
             'address'=>$this->address,
             'phone'=>$this->phone,
             'title'=>$this->title,
+            'is_signed'=>$this->is_signed,
+            'sign_draw'=>$this->sign_draw,
+            'link'=>UrlHelper::url("sign/".$this->contract->code."?user_code=".$this->code),
         ];
     }
 }

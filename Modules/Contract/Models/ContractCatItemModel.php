@@ -15,6 +15,9 @@ class ContractCatItemModel extends Model
         'sort_when_creating' => true,
     ];
 
+    protected $fillable=[
+        'title','contract_id','sort_order'
+    ];
     public function buildSortQuery()
     {
         return static::query()->where('contract_id', $this->item_id);
@@ -35,7 +38,7 @@ class ContractCatItemModel extends Model
 
 
     public function contents(){
-        return $this->hasMany(ContractItemModel::class,"contract_id","id");
+        return $this->hasMany(ContractItemModel::class,"contract_catitem_id","id");
     }
 
 
