@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Contract\App\Http\Controllers\CategoryController;
 use Modules\Contract\App\Http\Controllers\ContractController;
+use Modules\Contract\App\Http\Controllers\SignController;
 use Modules\Contract\App\Http\Controllers\UserController;
 
 /*
@@ -51,3 +52,11 @@ Route::middleware('auth:api')->group(function () {
 
     });
 });
+
+    Route::prefix('/sign')->group(function () {
+        Route::prefix('/check')->group(function () {
+            Route::controller(SignController::class)->group(function () {
+                Route::get('/{id}/{code}', 'check');
+            });
+        });
+    });
