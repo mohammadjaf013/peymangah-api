@@ -5,6 +5,8 @@ namespace Modules\Contract\Models\Sign;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Modules\Contract\Models\ContractModel;
+use Modules\Contract\Models\ContractUserModel;
 
 class SignAuthModel extends Model
 {
@@ -24,21 +26,15 @@ class SignAuthModel extends Model
     }
 
 
-//    public function users(){
-//
-//        return $this->hasMany(ContractUserModel::class,"contract_id","id");
-//    }
-//
-//
-//    public function items(){
-//        return $this->hasMany(ContractCatItemModel::class,"contract_id","id");
-//    }
-//    public function category(){
-//        return $this->hasOne(ContractCategoryModel::class,"id","category_id");
-//    }
-//
-//    public function item(){
-//        return $this->hasOne(ContractCatItemTempModel::class,"id","category_item_id");
-//    }
+    public function user(){
+
+        return $this->hasOne(ContractUserModel::class,"id","user_id");
+    }
+
+    public function contract(){
+
+        return $this->hasOne(ContractModel::class,"id","contract_id");
+    }
+
 
 }

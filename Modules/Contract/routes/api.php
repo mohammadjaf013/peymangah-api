@@ -54,6 +54,11 @@ Route::middleware('auth:api')->group(function () {
 });
 
     Route::prefix('/sign')->group(function () {
+            Route::controller(SignController::class)->group(function () {
+                Route::post('/otp', 'otp');
+                Route::post('/verify', 'verify');
+                Route::get('/data/{token}', 'details');
+            });
         Route::prefix('/check')->group(function () {
             Route::controller(SignController::class)->group(function () {
                 Route::get('/{id}/{code}', 'check');

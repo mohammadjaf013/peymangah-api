@@ -80,7 +80,7 @@ class AuthController extends Controller
 
 
         $user = UserModel::create($request->all());
-        dd($user);
+
         return response()->json([], 422);
     }
 
