@@ -83,6 +83,23 @@ class SignController extends Controller
         return response()->json(['contract' => new ContractResource($auth->contract),
             'items' => ContractItemResource::collection($auth->contract->items),
             'users' => ContractUserResource::collection($auth->contract->users),
+            'user' => new ContractUserResource($auth->user),
+            'status' => true]);
+
+    }
+   public function face(Request $request): JsonResponse
+    {
+        $auth = SignAuthModel::query()
+            ->where("reference",$request->post("token"))
+            ->first();
+        if (!$auth) {
+            return response()->json(['message' => 'فرایند ورود شما موفقیت آمیز نبوده است..'], 404);
+        }
+
+        $user = ContractUserModel::query()->where("id",$auth->user_id)->first();
+        $user->update();
+        dd($user);
+        return response()->json([
             'status' => true]);
 
     }

@@ -6,12 +6,28 @@ namespace Modules\Contract\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use QCod\ImageUp\HasImageUploads;
 
 class ContractUserModel extends Model
 {
+    use HasImageUploads;
 
     protected $table = "contract_users";
 
+    protected static $imageFields = [
+
+
+    ];
+    protected static $fileFields  = [
+        'video'=>[
+            'path' => 'videos',
+        ],
+        'face'=>[
+            'path' => 'faces',
+
+        ]
+
+    ];
     public const UPDATED_AT = null;
 
     protected static function boot()
