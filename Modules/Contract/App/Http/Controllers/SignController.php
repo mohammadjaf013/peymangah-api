@@ -97,8 +97,34 @@ class SignController extends Controller
         }
 
         $user = ContractUserModel::query()->where("id",$auth->user_id)->first();
+        $user->step=1;
         $user->update();
-        dd($user);
+
+        return response()->json([
+            'status' => true]);
+
+    }
+
+   public function signature(Request $request): JsonResponse
+    {
+        $auth = SignAuthModel::query()
+            ->where("reference",$request->post("token"))
+            ->first();
+        if (!$auth) {
+            return response()->json(['message' => 'فرایند ورود شما موفقیت آمیز نبوده است..'], 404);
+        }
+
+        $user = ContractUserModel::query()->where("id",$auth->user_id)->first();
+        $user->is_signed=1;
+        $user->update();
+
+        $csing =ContractUserModel::query()->where("contract_id",$user->contract_id)->where("is_signed",0)->count();
+
+        if($csing ==0){
+            $contract = ContractModel::query()->where("id",$user->contract_id)->first();
+            $contract->status="completed";
+            $contract->update();
+        }
         return response()->json([
             'status' => true]);
 

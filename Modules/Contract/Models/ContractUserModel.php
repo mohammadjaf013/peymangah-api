@@ -25,6 +25,10 @@ class ContractUserModel extends Model
         'face'=>[
             'path' => 'faces',
 
+        ],
+        'signature'=>[
+            'path' => 'signature',
+
         ]
 
     ];

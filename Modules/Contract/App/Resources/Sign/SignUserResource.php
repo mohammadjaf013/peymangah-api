@@ -24,7 +24,7 @@ class SignUserResource extends JsonResource
             'phone'=>$this->phone,
             'title'=>$this->title,
             'is_signed'=>$this->is_signed,
-            'sign_draw'=>$this->sign_draw,
+            'signature'=>$this->fileUrl("signature"),
             'link'=>UrlHelper::url("sign/".$this->contract->code."/".$this->code),
         ];
     }

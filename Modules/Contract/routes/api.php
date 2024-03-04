@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Contract\App\Http\Controllers\CategoryController;
 use Modules\Contract\App\Http\Controllers\ContractController;
+use Modules\Contract\App\Http\Controllers\ContractsController;
 use Modules\Contract\App\Http\Controllers\SignController;
 use Modules\Contract\App\Http\Controllers\UserController;
 
@@ -39,6 +40,10 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/payment/{id}', 'payment');
 
         });
+        Route::controller(ContractsController::class)->group(function () {
+            Route::get('/list', 'list');
+
+        });
 
 
         Route::prefix('/user')->group(function () {
@@ -59,6 +64,7 @@ Route::middleware('auth:api')->group(function () {
                 Route::post('/verify', 'verify');
                 Route::get('/data/{token}', 'details');
                 Route::post('/face/{token}', 'face');
+                Route::post('/signature/{token}', 'signature');
             });
         Route::prefix('/check')->group(function () {
             Route::controller(SignController::class)->group(function () {

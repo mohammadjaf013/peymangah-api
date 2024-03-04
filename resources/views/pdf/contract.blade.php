@@ -122,7 +122,13 @@ body {
         @foreach($contract->users as $index => $user)
             <div style="width: 150px;float: right;padding-left: 50px;">
 
-                {{ $user->first_name }} {{ $user->last_name }}
+                <div>
+                    {{ $user->first_name }} {{ $user->last_name }}
+                </div>
+             @if($user->is_signed)  <div>
+                   <img src="{{$user->fileUrl("signature")}}" />
+               </div>
+                @endif
             </div>
         @endforeach
 

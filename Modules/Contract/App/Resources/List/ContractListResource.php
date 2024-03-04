@@ -1,10 +1,10 @@
 <?php
-namespace Modules\Contract\App\Resources;
+namespace Modules\Contract\App\Resources\List;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ContractResource extends JsonResource
+class ContractListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,7 +17,7 @@ class ContractResource extends JsonResource
             'category_id'=>$this->category_id ,
             'category'=>$this->category->title,
             'category_item_id'=>$this->category_item_id,
-            'category_item'=>$this->item->title,
+//            'category_item'=>$this->item->title,
             'is_paid'=>(bool) $this->is_paid,
             'is_locked'=>(bool) $this->is_locked,
             'created_at'=>$this->created_at,
