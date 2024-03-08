@@ -26,6 +26,8 @@ Route::prefix('/contract')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
+
+
     Route::prefix('/contract')->group(function () {
         Route::prefix('/category')->group(function () {
             Route::controller(CategoryController::class)->group(function () {

@@ -11,11 +11,13 @@ class ContractCategoryResource extends JsonResource
      */
     public function toArray($request): array
     {
+
         return [
             'id'=>$this->alias,
             'title'=>$this->title,
             'hint'=>$this->hint,
             'description'=>$this->description,
+            'subs'=>ContractItemViewResource::collection($this->subs)
         ];
     }
 }

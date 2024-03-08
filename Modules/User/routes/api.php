@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\User\App\Http\Controllers\ChangePassController;
+use Modules\User\App\Http\Controllers\TransactionsController;
 use Modules\User\App\Http\Controllers\UserController;
 
 /*
@@ -16,14 +16,20 @@ use Modules\User\App\Http\Controllers\UserController;
     |
 */
 Route::middleware('auth:api')->group(function () {
-Route::prefix('/user')->group(function () {
-    Route::controller(ChangePassController::class)->group(function () {
-        Route::post('/change-pass', 'index');
+    Route::prefix('/user')->group(function () {
+        Route::controller(ChangePassController::class)->group(function () {
+            Route::post('/change-pass', 'index');
+        });
+
+        Route::controller(UserController::class)->group(function () {
+            Route::post('/update-data', 'updateData');
+        });
+
     });
 
-    Route::controller(UserController::class)->group(function () {
-        Route::post('/update-data', 'updateData');
+    Route::prefix('/transactions')->group(function () {
+        Route::controller(TransactionsController::class)->group(function () {
+            Route::get('/', 'index');
+        });
     });
-
-});
 });

@@ -26,4 +26,9 @@ class PaymentLogModel extends Model
         'is_paid'=>'boolean'
     ];
 
+
+    public function contract()
+    {
+        return $this->hasOne(ContractModel::class,"id","contract_id");
+    }
 }

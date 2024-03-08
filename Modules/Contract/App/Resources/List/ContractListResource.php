@@ -24,6 +24,8 @@ class ContractListResource extends JsonResource
             'updated_at'=>$this->updated_at,
             'status'=>$this->status,
             'price'=>$this->price,
+            'singCount'=>$this->users->count(),
+            'isSignedCount'=>$this->users->where("is_signed",1)->count(),
         ];
     }
 }

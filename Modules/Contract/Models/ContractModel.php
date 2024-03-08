@@ -25,7 +25,6 @@ class ContractModel extends Model
 
 
     public function users(){
-
         return $this->hasMany(ContractUserModel::class,"contract_id","id");
     }
 

@@ -87,14 +87,19 @@ class ContractController extends Controller
     public function create(ContractCreateRequest $request): JsonResponse
     {
 
-        $category = ContractCategoryModel::query()->where("alias", $request->post("category"))->first();
+        $category = ContractCatItemTempModel::query()->where("id", $request->post("category"))->first();
+
+
         if (!$category) {
             return response()->json(['status' => false, 'message' => 'دسته بندی پیدا نشد.'], 404);
         }
+
+
         $contract = new ContractModel();
         $contract->user_id = auth()->id();
         $contract->title = $request->post('title');
-        $contract->category_id = $category->id;
+        $contract->category_id = $category->mainCat->id;
+        $contract->category_item_id  = $category->id;
         $contract->save();
         return response()->json(['status' => true, 'contract_id' => $contract->code]);
     }
@@ -110,11 +115,8 @@ class ContractController extends Controller
         if (!$contract) {
             return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
         }
-
         $tempData = ContractCatItemTempModel::query()->where("id", $contract->category_item_id)->first();
-
-
-        return response()->json(['contract' => new ContractResource($contract), 'template' => new ContractTempResource($tempData), 'items' => ContractItemResource::collection($contract->items), 'users' => ContractUserResource::collection($contract->users), 'status' => true]);
+        return response()->json(['contract' => new ContractResource($contract), 'template' => (!$tempData) ? null : new ContractTempResource($tempData), 'items' => ContractItemResource::collection($contract->items), 'users' => ContractUserResource::collection($contract->users), 'status' => true]);
 
     }
 

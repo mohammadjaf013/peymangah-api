@@ -23,7 +23,7 @@ class ContractCreateRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:150',
-            'category' => 'required|exists:contract_category,alias',
+//            'category' => 'required|exists:t_contract_cat_item,id',
 
         ];
     }
