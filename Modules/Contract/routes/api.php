@@ -39,7 +39,9 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/create', 'create');
             Route::get('/details/{id}', 'details');
             Route::post('/cr/{id}', 'cr');
+            Route::post('/update/{id}', 'update');
             Route::post('/payment/{id}', 'payment');
+            Route::post('/active/{id}', 'active');
 
         });
         Route::controller(ContractsController::class)->group(function () {
