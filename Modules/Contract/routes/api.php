@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Contract\App\Http\Controllers\CategoryController;
 use Modules\Contract\App\Http\Controllers\ContractController;
 use Modules\Contract\App\Http\Controllers\ContractsController;
+use Modules\Contract\App\Http\Controllers\DashboardController;
 use Modules\Contract\App\Http\Controllers\SignController;
 use Modules\Contract\App\Http\Controllers\UserController;
 
@@ -25,8 +26,14 @@ Route::prefix('/contract')->group(function () {
     });
 });
 
+
 Route::middleware('auth:api')->group(function () {
 
+    Route::prefix('/dashboard')->group(function () {
+        Route::controller(DashboardController::class)->group(function () {
+            Route::get('/', 'index');
+        });
+    });
 
     Route::prefix('/contract')->group(function () {
         Route::prefix('/category')->group(function () {
@@ -62,17 +69,17 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
-    Route::prefix('/sign')->group(function () {
-            Route::controller(SignController::class)->group(function () {
-                Route::post('/otp', 'otp');
-                Route::post('/verify', 'verify');
-                Route::get('/data/{token}', 'details');
-                Route::post('/face/{token}', 'face');
-                Route::post('/signature/{token}', 'signature');
-            });
-        Route::prefix('/check')->group(function () {
-            Route::controller(SignController::class)->group(function () {
-                Route::get('/{id}/{code}', 'check');
-            });
+Route::prefix('/sign')->group(function () {
+    Route::controller(SignController::class)->group(function () {
+        Route::post('/otp', 'otp');
+        Route::post('/verify', 'verify');
+        Route::get('/data/{token}', 'details');
+        Route::post('/face/{token}', 'face');
+        Route::post('/signature/{token}', 'signature');
+    });
+    Route::prefix('/check')->group(function () {
+        Route::controller(SignController::class)->group(function () {
+            Route::get('/{id}/{code}', 'check');
         });
     });
+});

@@ -5,8 +5,11 @@ namespace Modules\Auth\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Modules\Auth\App\Events\OtpEvent;
+use Modules\Auth\App\Http\Requests\ForgetPassRequest;
 use Modules\Auth\App\Http\Requests\LoginRequest;
 use Modules\Auth\App\Http\Requests\RegisterOtpRequest;
 use Modules\Auth\App\Http\Requests\RegisterRequest;
@@ -45,12 +48,10 @@ class AuthController extends Controller
     {
 
         $otpData = (new Otp)->generate($request->post("mobile"), 'numeric', 5, 60);
-
-
-//        event(new OtpEvent($request->mobile,$otpData->token));
-
+        event(new OtpEvent($request->mobile,$otpData->token));
         return response()->json([]);
     }
+
 
     /**
      * Display a listing of the resource.
@@ -81,7 +82,58 @@ class AuthController extends Controller
 
         $user = UserModel::create($request->all());
 
-        return response()->json([], 422);
+        $tokenResult = $user->createToken('user');
+        $token = $tokenResult->token;
+        $token->expires_at = Carbon::now()->addWeeks(54);
+        $token->save();
+        return response()->json([
+            'user'=>new UserPublicResource($user),
+            'access_token' => $tokenResult->accessToken,
+            'token_type' => 'Bearer',
+            'expires_at' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
+        ]);
+
     }
+
+
+    public function forgetOtp(Request $request): JsonResponse
+    {
+
+        $check = UserModel::query()->where("mobile",$request->post("mobile"))->exists();
+        if(!$check){
+            return response()->json(['message' => 'شماره شما یافت نشد.'],404);
+
+        }
+        $otpData = (new Otp)->generate($request->post("mobile"), 'numeric', 5, 60);
+//        event(new OtpEvent($request->mobile,$otpData->token));
+        return response()->json([]);
+    }
+
+
+    public function forgetVerify(Request $request): JsonResponse
+    {
+
+        $validate = (new Otp)->validate($request->post("mobile"), $request->post("otp"));
+
+        if ($validate->status) {
+            return response()->json([]);
+        }
+
+        return response()->json(["message" => "کد فعال سازی شما اشتباه میباشد."], 422);
+    }
+    public function forgetPass(ForgetPassRequest $request): JsonResponse
+    {
+
+        $validate = (new Otp)->validate($request->post("mobile"), $request->post("otp"));
+
+        if ($validate->status) {
+            return response()->json(['message' => 'کد فعال سازی صحیح نمیباشد.']);
+        }
+        $check = UserModel::query()->where("mobile",$request->post("mobile"))->first();
+        $check->password = $request->post("password");
+        $check->save();
+        return response()->json(["status"=>true]);
+    }
+
 
 }

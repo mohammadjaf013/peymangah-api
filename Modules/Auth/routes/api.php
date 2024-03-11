@@ -23,6 +23,11 @@ Route::prefix('/auth')->group(function () {
         Route::post('/register-verify', 'registerVerify');
         Route::post('/register', 'register');
         Route::get('/data', 'data');
+        Route::post('/forget-otp', 'forgetOtp');
+        Route::post('/forget-verify', 'forgetVerify');
+        Route::post('/forget-pass', 'forgetPass');
+
+
     });
 
 });
