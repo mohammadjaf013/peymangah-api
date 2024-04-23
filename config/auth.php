@@ -38,11 +38,17 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'admins',
         ],
         'api' => [
             'driver' => 'passport',
             'provider' => 'apiUserProvider',
+        ],
+
+        'backpack' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+            'remember' => 43800,
         ],
     ],
 
@@ -66,11 +72,16 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => \App\Models\AdminModel::class,
         ],
         'apiUserProvider' => [
             'driver' => 'eloquent',
             'model' => \Modules\User\Models\UserModel::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\AdminModel::class,
         ],
         // 'users' => [
         //     'driver' => 'database',
