@@ -1,12 +1,13 @@
 <?php
 
-namespace Modules\User\App\Http\Requests;
+namespace Modules\Contract\App\Http\Requests;
+
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateDataRequest extends FormRequest
+class ReceiptCreateRequest extends FormRequest
 {
     public function authorize()
     {
@@ -22,19 +23,10 @@ class UpdateDataRequest extends FormRequest
     public function rules()
     {
         return [
-            'nationalCode' => 'required',
-            'birthDay' => 'required|shamsi_date',
-            'email' => 'required|email|unique:users,email',
+            'title' => 'required|string|max:150',
+            'body' => 'required|string|max:2500',
+//            'category' => 'required|exists:t_contract_cat_item,id',
 
         ];
     }
-    public function attributes()
-    {
-        return [
-            'nationalCode' => 'کد ملی',
-            'birthDay' => 'تاریخ تولد',
-            'email' => 'ایمیل',
-        ];
-    }
-
 }

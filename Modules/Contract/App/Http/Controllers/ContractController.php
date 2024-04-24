@@ -2,6 +2,8 @@
 
 namespace Modules\Contract\App\Http\Controllers;
 
+use App\Events\SendSmsActiveEvent;
+use App\Events\SendSmsPreviewEvent;
 use App\Http\Controllers\Controller;
 use App\Libs\Helper\UrlHelper;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +18,7 @@ use Modules\Contract\App\Resources\ContractUserResource;
 use Modules\Contract\Models\contract_template\ContractCatItemTempModel;
 use Modules\Contract\Models\ContractCatItemModel;
 use Modules\Contract\Models\ContractItemModel;
+use Modules\Contract\Models\ContractLogModel;
 use Modules\Contract\Models\ContractModel;
 use Modules\Contract\Models\PaymentLogModel;
 use PDF;
@@ -93,13 +96,23 @@ class ContractController extends Controller
             return response()->json(['status' => false, 'message' => 'دسته بندی پیدا نشد.'], 404);
         }
 
-
         $contract = new ContractModel();
         $contract->user_id = auth()->id();
         $contract->title = $request->post('title');
         $contract->category_id = $category->mainCat->id;
         $contract->category_item_id = $category->id;
         $contract->save();
+
+
+        $log = new ContractLogModel();
+        $log->contract_id = $contract->id;
+        $log->user_id = auth()->id();
+        $log->ip = $request->getClientIp();
+        $log->user_agent = $request->userAgent();
+        $log->event = "CREATE";
+        $log->message = "ایجاد قرارداد";
+        $log->save();
+
         return response()->json(['status' => true, 'contract_id' => $contract->code]);
     }
 
@@ -115,13 +128,53 @@ class ContractController extends Controller
         if (!$contract) {
             return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
         }
-         if ($contract->is_paid ==0) {
+        if ($contract->is_paid == 0) {
             return response()->json(['message' => 'مبلغ قرارداد را پرداخت کنید سپس درخواست فعال سازی را ارسال نمایید.'], 404);
         }
 
-        $contract->is_locked =1;
-        $contract->status ="signing";
+        $contract->is_locked = 1;
+        $contract->status = "signing";
         $contract->save();
+
+        $log = new ContractLogModel();
+        $log->contract_id = $contract->id;
+        $log->user_id = auth()->id();
+        $log->ip = $request->getClientIp();
+        $log->user_agent = $request->userAgent();
+        $log->event = "ACTIVE";
+        $log->message = "فعل سازی قرارداد";
+        $log->save();
+        event(new SendSmsActiveEvent($contract));
+
+        return response()->json(['status' => true]);
+
+    }
+
+    public function sendsms(Request $request, $id): JsonResponse
+    {
+
+        $contract = ContractModel::query()->where("user_id", auth()->id())
+            ->where("code", $id)->first();
+        if (!$contract) {
+            return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
+        }
+        if ($contract->is_locked) {
+            return response()->json(['message' => 'قرارداد فعال سازی شده قابل ارسال پیشنمایش نیست.'], 404);
+        }
+
+
+        event(new SendSmsPreviewEvent($contract));
+
+
+        $log = new ContractLogModel();
+        $log->contract_id = $contract->id;
+        $log->user_id = auth()->id();
+        $log->ip = $request->getClientIp();
+        $log->user_agent = $request->userAgent();
+        $log->event = "PREVIEW_SMS";
+        $log->message = "ارسال پیامک پیشنمایش";
+        $log->save();
+
         return response()->json(['status' => true]);
 
     }
@@ -251,6 +304,18 @@ class ContractController extends Controller
                 $contract->is_paid = 1;
                 $contract->update();
             }
+
+
+            $log = new ContractLogModel();
+            $log->contract_id = $contract->id;
+            $log->user_id = auth()->id();
+            $log->ip = $request->getClientIp();
+            $log->user_agent = $request->userAgent();
+            $log->event = "PAY";
+            $log->message = "پرداخت";
+            $log->save();
+
+
             DB::commit();
             return redirect(UrlHelper::url("/panel/contract/" . $contract->code . "/details"));
 
@@ -278,7 +343,7 @@ class ContractController extends Controller
         if (!$contract) {
             return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
         }
-        if ($contract->is_locked ==1) {
+        if ($contract->is_locked == 1) {
             return response()->json(['message' => 'امکان بروزرسانی وجود ندارد.'], 404);
         }
         if (!$request->has("cats")) {
@@ -295,29 +360,29 @@ class ContractController extends Controller
 
                 if (isset($cat['id'])) {
 
-                    $catData =ContractCatItemModel::query()
-                        ->where("code",$cat['id'])
-                        ->where("contract_id",$contract->id)->first();
+                    $catData = ContractCatItemModel::query()
+                        ->where("code", $cat['id'])
+                        ->where("contract_id", $contract->id)->first();
 
 
-                    if($catData){
+                    if ($catData) {
 
-                        $catData->title =$cat['title'];
+                        $catData->title = $cat['title'];
                         $catData->save();
                     }
-                    if(isset($cat['contents']) && is_array($cat['contents'])){
+                    if (isset($cat['contents']) && is_array($cat['contents'])) {
                         foreach ($cat['contents'] as $content) {
                             if (isset($content['id'])) {
 
                                 $contentItem = ContractItemModel::query()
-                                    ->where("contract_id",$contract->id)
-                                    ->where("code",$content['id'])
-                                    ->where("contract_catitem_id",$catData->id)->first();
-                                if($contentItem){
-                                    $contentItem->content =  $content['content'];
+                                    ->where("contract_id", $contract->id)
+                                    ->where("code", $content['id'])
+                                    ->where("contract_catitem_id", $catData->id)->first();
+                                if ($contentItem) {
+                                    $contentItem->content = $content['content'];
                                     $contentItem->update();
                                 }
-                            }else{
+                            } else {
                                 ContractItemModel::create([
                                     'content' => $content['content'],
                                     'contract_catitem_id' => $catData->id,
@@ -343,12 +408,21 @@ class ContractController extends Controller
                         ]);
                     }
                 }
+
+                $log = new ContractLogModel();
+                $log->contract_id = $contract->id;
+                $log->user_id = auth()->id();
+                $log->ip = $request->getClientIp();
+                $log->user_agent = $request->userAgent();
+                $log->event = "UPDATE";
+                $log->message = "بروزرسانی قرارداد";
+                $log->save();
+
                 DB::commit();
             }
             return response()->json(['status' => true]);
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
             return response()->json(['message' => 'خطا داده های ارسالی معتبر نمیباشد..'], 404);
 
         }

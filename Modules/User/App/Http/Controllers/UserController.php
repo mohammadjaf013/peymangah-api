@@ -19,7 +19,7 @@ class UserController extends Controller
     {
 
         $user = auth()->user();
-        $kycSystem = new KycSystem("itsaz");
+       /* $kycSystem = new KycSystem("itsaz");
 
         $validateData = UserValidationModel::query()->where("user_id", $user->id)->first();
         if (!$validateData) {
@@ -40,9 +40,9 @@ class UserController extends Controller
                 $validateData->shahkar_data = $ssnResult;
                 $validateData->save();
             }
-        }
+        }*/
 
-        if (!$validateData->shahkar == 0) {
+      /*  if (!$validateData->shahkar == 0) {
             $result = $kycSystem->civil($request->post('nationalCode'), $request->post('birthDay'),time());
             if($result === 0){
                 return response()->json(['errors' => ['nationalCode' => ['اطلاعات کد ملی و تاریخ تولد شما مطابقت ندارد.']], 'status' => false], 422);
@@ -55,17 +55,26 @@ class UserController extends Controller
             $resultImage = $kycSystem->personPhoto($request->post('nationalCode'), $request->post('birthDay'));
             $validateData->inquery = true;
             $validateData->inquery_data = $result;
-            $validateData->image= $resultImage->data;
+            $validateData->image= $resultImage;
             $validateData->save();
+
+
             $user->real_first_name= $result->data->firstName;
             $user->real_last_name= $result->data->lastName;
             $user->ssn= $result->data->nationalCode;
             $user->is_verified= true;
+            $user->email= $request->post("email");
             $user->save();
 
 
 
-        }
+        }*/
+
+
+        $user->birthDay= $request->post("birthDay");
+        $user->nationalCode= $request->post("nationalCode");
+        $user->email= $request->post("email");
+        $user->save();
 
         return response()->json();
 

@@ -3,17 +3,21 @@
 namespace Modules\Contract\App\Http\Controllers;
 
 
+
 use App\Http\Controllers\Controller;
 use App\Libs\Service\KycSystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Contract\App\Http\Requests\UserContractRequest;
 use Modules\Contract\App\Resources\ContractUserResource;
+use Modules\Contract\App\Resources\Receipt\ReceiptUserResource;
 use Modules\Contract\Models\ContractModel;
 use Modules\Contract\Models\ContractUserModel;
+use Modules\Contract\Models\Receipt\ReceiptModel;
+use Modules\Contract\Models\Receipt\ReceiptUserModel;
 use Modules\User\Models\UserModel;
 
-class UserController extends Controller
+class UserReceiptController extends Controller
 {
     public array $data = [];
 
@@ -40,27 +44,27 @@ class UserController extends Controller
     public function list(Request $request, string $id): JsonResponse
     {
 
-        $contract = ContractModel::query()->where("user_id", auth()->id())
+        $contract = ReceiptUserModel::query()->where("user_id", auth()->id())
             ->where("code", $id)->first();
         if (!$contract) {
             return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
         }
-        return response()->json(['users' => ContractUserResource::collection($contract->users), 'status' => true]);
+        return response()->json(['users' => ReceiptUserResource::collection($contract->users), 'status' => true]);
     }
 
     public function add(UserContractRequest $request): JsonResponse
     {
 
 
-        $contract = ContractModel::query()->where("user_id", auth()->id())
-            ->where("code", $request->post("contract_id"))->first();
+        $contract = ReceiptModel::query()->where("user_id", auth()->id())
+            ->where("code", $request->post("receipt_id"))->first();
 
 
         if (!$contract) {
-            return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
+            return response()->json(['message' => 'رسیدی یافت نشد.'], 404);
         }
 
-        $user = ContractUserModel::query()->where("contract_id", $contract->id)
+        $user = ReceiptUserModel::query()->where("receipt_id", $contract->id)
             ->where("ssn", $request->post('nationalCode'))->first();
 
         if ($user) {
@@ -103,7 +107,7 @@ class UserController extends Controller
 
         $userExist = UserModel::query()->where("mobile", $request->post("mobile"))->first();
 
-        $user = new ContractUserModel();
+        $user = new ReceiptUserModel();
         if ($userExist) {
             $user->user_id = $userExist->id;
         }
@@ -113,11 +117,12 @@ class UserController extends Controller
         $user->title = $request->post("title");
         $user->first_name = $result->data->firstName;
         $user->last_name = $result->data->lastName;
-        $user->contract_id = $contract->id;
+        $user->receipt_id = $contract->id;
         $user->data = $result->data;
         $user->photo = $resultImage;
         $user->address = $request->post("address");
         $user->phone = $request->post("phone");
+        $user->email = $request->post("email");
 
         $user->save();
 
@@ -126,7 +131,7 @@ class UserController extends Controller
             $contract->price = 35000 * $contract->users->count();
         }
         $contract->save();
-        return response()->json(['user' => new ContractUserResource($user), 'status' => true]);
+        return response()->json(['user' => new ReceiptUserResource($user), 'status' => true]);
     }
 
 

@@ -100,12 +100,13 @@ class AuthController extends Controller
     {
 
         $check = UserModel::query()->where("mobile",$request->post("mobile"))->exists();
+
         if(!$check){
             return response()->json(['message' => 'شماره شما یافت نشد.'],404);
 
         }
         $otpData = (new Otp)->generate($request->post("mobile"), 'numeric', 5, 60);
-//        event(new OtpEvent($request->mobile,$otpData->token));
+        event(new OtpEvent($request->mobile,$otpData->token));
         return response()->json([]);
     }
 
