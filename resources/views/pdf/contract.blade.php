@@ -28,8 +28,8 @@
     header: page-header;
     footer: page-footer;
 
-    border: 2mm solid #000000; /* اضافه کردن حاشیه به هر صفحه */
-    padding: 10mm; /* اضافه کردن فاصله داخلی به محتوای داخل حاشیه */
+    border: 2mm solid #000000;
+    padding: 10mm;
 }
 body {
     margin: 0;
@@ -43,7 +43,6 @@ body {
 
 
 <htmlpageheader name="page-header">
-
 
     <table width="100%" dir="rtl" style="border-bottom:1px solid black;padding-bottom: 15px;">
         <tr>
@@ -59,7 +58,18 @@ body {
             <td width="33%" style="text-align: left;">
                 <span style="font-size: 10px;">
                     تاریخ قرارداد:
-                    {{\Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($contract->created_at))->format('%A, %d %B %Y')}}</span>
+                   @if($isSigned)
+                        {{\Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($date))->format('%A, %d %B %Y')}}
+                    @endif
+                </span>
+                <div style="font-size: 10px;">
+                    <div style="padding-top: 5px"></div>
+                     شماره قرارداد: {{$contract->id}}
+                </div>
+                <div style="font-size: 10px;">
+                    <div style="padding-top: 5px"></div>
+                     پیوست : {!! ( count($contract->attaches) ) ? count($contract->attaches) . " فایل " : "ندارد"  !!}
+                </div>
             </td>
         </tr>
     </table>
@@ -70,14 +80,23 @@ body {
     <table width="100%" dir="rtl" style="border-top:1px solid black;padding-top: 10px;">
         <tr>
             <td width="33%" style="text-align: right;">
-                {{$contract->title}}
+                <div style="width: 100%;text-align: center;font-size: 10px;" >
+                    این قرارداد در پلتفرم
+                    <a href="https://peymangah.com" target="_blank" style="text-decoration: none;color: black">
+                        پیمانگاه
+                    </a>
+                    ایجاد شده است.
+                </div>
             </td>
 
             <td width="33%" align="center" style="; ;">
                 {PAGENO}/{nbpg}
             </td>
             <td width="33%" style="text-align: left;">
-                <span style="; ;">{{\Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($contract->created_at))->format('%A, %d %B %y')}}</span>
+                <a href="https://peymangah.com" target="_blank" style="text-decoration: none;font-size: 10px">
+                www.peymangah.com
+                </a>
+{{--                <span style="; ;">{{\Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($contract->created_at))->format('%A, %d %B %y')}}</span>--}}
             </td>
         </tr>
     </table>
@@ -134,6 +153,13 @@ body {
 
 
     </div>
+
+
+    @if(!$isSigned)
+        <div style="color:red; text-align: center; font-size: 20px ; font-weight: bold">
+            قرارداد نهایی نشده است.
+        </div>
+    @endif
 </div>
 </body>
 </html>

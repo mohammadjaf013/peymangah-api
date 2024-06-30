@@ -17,7 +17,7 @@ class ContractModel extends Model
         parent::boot();
 
         $creationCallback = function ($model) {
-            $model->code = Str::uuid()->toString();
+            $model->code = Str::random(24);
         };
 
         static::creating($creationCallback);
@@ -38,6 +38,10 @@ class ContractModel extends Model
 
     public function item(){
         return $this->hasOne(ContractCatItemTempModel::class,"id","category_item_id");
+    }
+
+    public function attaches(){
+        return $this->hasMany(ContractAttacheModel::class,"contract_id","id");
     }
 
 }

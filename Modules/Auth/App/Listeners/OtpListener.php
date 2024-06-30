@@ -24,18 +24,51 @@ class OtpListener
     public function handle($event): void
     {
 
-
         $data = [
             "ParameterArray" => [
                 [
-                    "Parameter" => "code",
+                    "Parameter" => "CODE",
                     "ParameterValue" => (string)$event->otp
                 ]
             ],
             "Mobile" => PersianHelper::normalize($event->mobile),
-            "TemplateId" => "30271"
+            "TemplateId" => "744450"
         ];
         $sms = (new SmsCenter())->UltraFastSend($data);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.sms.ir/v1/send/verify',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>'{
+        "mobile": "'.$event->mobile.'",
+        "templateId": "744450",
+        "parameters": [
+
+          {
+              "name":"CODE",
+              "value":"'.(string)$event->otp.'"
+          }
+        ]
+      }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                'Accept: text/plain',
+                'x-api-key: yGXY4YHLxNpqEOcM8vWDuyZBxUCy1chotH24dBPzvHljHt6LzWa5nBPKkZBWqD6h'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        report($response);
 //        $log = new SmsLogModel();
 //        $log->data = $data;
 //        $log->result = $sms;

@@ -6,10 +6,12 @@ use App\Events\SendSmsActiveReceiptEvent;
 use App\Events\SendSmsPreviewEvent;
 use App\Events\SendSmsActiveEvent;
 use App\Events\SendSmsPreviewReceiptEvent;
+use App\Events\SendSmsSignEvent;
 use App\Listeners\SendSmsActiveReceiptListener;
 use App\Listeners\SendSmsPreviewListener;
 use App\Listeners\SendSmsActiveListener;
 use App\Listeners\SendSmsReceiptPreviewListener;
+use App\Listeners\SendSmsSignListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -41,6 +43,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendSmsActiveReceiptEvent::class => [
             SendSmsActiveReceiptListener::class,
+        ],
+        SendSmsSignEvent::class => [
+            SendSmsSignListener::class,
         ],
     ];
 

@@ -11,15 +11,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Contract\App\Http\Requests\ContractCreateRequest;
+use Modules\Contract\App\Resources\ContractAttacheResource;
 use Modules\Contract\App\Resources\ContractItemResource;
 use Modules\Contract\App\Resources\ContractResource;
 use Modules\Contract\App\Resources\ContractTempResource;
 use Modules\Contract\App\Resources\ContractUserResource;
 use Modules\Contract\Models\contract_template\ContractCatItemTempModel;
+use Modules\Contract\Models\ContractAttacheModel;
 use Modules\Contract\Models\ContractCatItemModel;
 use Modules\Contract\Models\ContractItemModel;
 use Modules\Contract\Models\ContractLogModel;
 use Modules\Contract\Models\ContractModel;
+use Modules\Contract\Models\ContractUserModel;
 use Modules\Contract\Models\PaymentLogModel;
 use PDF;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
@@ -44,11 +47,17 @@ class ContractController extends Controller
         if (!$contract) {
             return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
         }
-//
 
-//        return view('pdf.contract', ['contract'=>$contract]);
+        $fd= null;
+        $date = ContractUserModel::query()->where("contract_id",$contract->id)->orderBy("sign_at","desc")->first();
+        if($date){
 
-        $pdf = PDF::loadView('pdf.contract', ['contract' => $contract], [], [
+            $fd =$date->sign_at;
+        }
+
+        $isSignd = $contract->users->count() == $contract->users->where("is_signed",1)->count();
+
+        $pdf = PDF::loadView('pdf.contract', ['contract' => $contract ,'date'=>$fd, 'isSigned'=>$isSignd], [], [
             'mode' => 'utf-8',
             'format' => 'A4',
             'default_font_size' => '10',
@@ -62,7 +71,7 @@ class ContractController extends Controller
             'margin_header' => 10,
             'margin_footer' => 10,
             'orientation' => 'P',
-            'watermark' => 'پیمانگاه',
+            'watermark' => $isSignd ? 'پیمانگاه' : '',
 
             'show_watermark' => true,
             'custom_font_dir' => base_path('resources/fonts/'),
@@ -427,4 +436,45 @@ class ContractController extends Controller
 
         }
     }
+
+    public function attache(Request $request, $id): JsonResponse
+    {
+
+        $contract = ContractModel::query()->where("user_id", auth()->id())
+            ->where("code", $id)->first();
+        if (!$contract) {
+            return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
+        }
+
+
+        $log = new ContractAttacheModel();
+        $log->contract_id = $contract->id;
+        $log->user_id = auth()->id();
+        $log->save();
+
+        $log->refresh();
+        return response()->json(['status' => true,"file"=>ContractAttacheResource::make($log)]);
+
+    }
+    public function attacheRemove(Request $request, $id): JsonResponse
+    {
+
+        $contract = ContractModel::query()->where("user_id", auth()->id())
+            ->where("code", $id)->first();
+        if (!$contract) {
+            return response()->json(['message' => 'قراردادی یافت نشد.'], 404);
+        }
+
+
+        $log =  ContractAttacheModel::query()->where("contract_id",$contract->id)
+            ->where("user_id",auth()->id())
+            ->where("code",$request->post("id"))->first();
+        if (!$log) {
+            return response()->json(['message' => 'پیوستی یافت نشد.'], 404);
+        }
+        $log->delete();
+        return response()->json(['status' => true]);
+
+    }
+
 }

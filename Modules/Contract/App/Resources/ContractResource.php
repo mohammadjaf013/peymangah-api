@@ -24,6 +24,8 @@ class ContractResource extends JsonResource
             'updated_at'=>$this->updated_at,
             'status'=>$this->status,
             'price'=>$this->price,
+            'attaches'=>ContractAttacheResource::collection($this->attaches),
+
         ];
     }
 }

@@ -118,6 +118,7 @@ class UserController extends Controller
         $user->photo = $resultImage;
         $user->address = $request->post("address");
         $user->phone = $request->post("phone");
+        $user->email = $request->post("email");
 
         $user->save();
 

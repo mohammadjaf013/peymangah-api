@@ -25,6 +25,7 @@ class UserContractRequest extends FormRequest
             'mobile' => 'required|ir_mobile:zero',
             'birthDay' => 'required|shamsi_date',
             'address' => 'required',
+            'email' => 'email',
             'phone' => 'required|ir_phone_with_code',
 
         ];

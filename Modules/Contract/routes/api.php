@@ -85,6 +85,8 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/update/{id}', 'update');
             Route::post('/payment/{id}', 'payment');
             Route::post('/active/{id}', 'active');
+            Route::post('/attache/{id}', 'attache');
+            Route::post('/attache-remove/{id}', 'attacheRemove');
             Route::post('/sendsms/{id}', 'sendsms');
 
         });

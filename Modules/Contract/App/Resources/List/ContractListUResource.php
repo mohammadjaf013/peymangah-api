@@ -4,6 +4,7 @@ namespace Modules\Contract\App\Resources\List;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Contract\App\Resources\ContractAttacheResource;
 use Modules\Contract\App\Resources\ContractUserResource;
 
 class ContractListUResource extends JsonResource
@@ -28,6 +29,7 @@ class ContractListUResource extends JsonResource
             'price'=>$this->price,
             'singCount'=>$this->users->count(),
             'users'=>ContractUserResource::collection($this->users),
+            'attaches'=>ContractAttacheResource::collection($this->attaches),
             'isSignedCount'=>$this->users->where("is_signed",1)->count(),
         ];
     }

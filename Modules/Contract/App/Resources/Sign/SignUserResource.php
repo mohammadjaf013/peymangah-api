@@ -17,6 +17,7 @@ class SignUserResource extends JsonResource
             'id'=>$this->code,
             'mobile'=>$this->mobile,
             'ssn'=>$this->ssn,
+            'email'=>$this->email,
             'birthday'=>$this->birthday,
             'first_name'=>$this->first_name,
             'last_name'=>$this->last_name,

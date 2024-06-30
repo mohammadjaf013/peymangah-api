@@ -6,7 +6,7 @@ use App\Libs\Helper\PersianHelper;
 use App\Libs\Helper\UrlHelper;
 use App\Libs\SmsCenter\SmsCenter;
 use Cryptommer\Smsir\Smsir;
-class SendSmsActiveListener
+class SendSmsSignListener
 {
     /**
      * Create the event listener.
@@ -22,12 +22,11 @@ class SendSmsActiveListener
     public function handle(object $event): void
     {
 
-        foreach ($event->contract->users as $user){
 
 
 
 
-            $mobile = PersianHelper::normalize($user->mobile);
+            $mobile = PersianHelper::normalize($event->user->mobile);
 
             $curl = curl_init();
 
@@ -42,19 +41,19 @@ class SendSmsActiveListener
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS =>'{
         "mobile": "'.$mobile.'",
-        "templateId": "199985",
+        "templateId": "486465",
         "parameters": [
           {
             "name": "NAME",
-            "value": "'.(string)$user->first_name . ' ' .$user->last_name.'"
+            "value": "'.(string)$event->user->first_name . ' ' .$event->user->last_name.'"
           },
           {
-              "name":"CODE1",
-              "value":"'.$event->contract->code.'"
+              "name":"CONTRACT",
+              "value":"'.$event->contract->title.'"
           },
           {
-              "name":"CODE2",
-              "value":"'.$user->code.'"
+              "name":"USER_NAME",
+              "value":"'.$event->singer->first_name . ' ' .$event->singer->last_name.'"
           }
         ]
       }',
@@ -72,8 +71,6 @@ class SendSmsActiveListener
 
 
 
-
-        }
 
     }
 }
